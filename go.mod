@@ -11,3 +11,5 @@ require (
 	golang.org/x/mod v0.13.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
 )
+
+replace github.com/philhofer/fwd github.com/formationgames/fwd v1.1.2-static

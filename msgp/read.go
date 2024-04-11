@@ -132,6 +132,11 @@ func NewReaderBuf(r io.Reader, buf []byte) *Reader {
 	return &Reader{R: fwd.NewReaderBuf(r, buf)}
 }
 
+// NewReaderStatic returns a *Reader that reads the provided buffer without modification.
+func NewReaderStatic(source []byte) *Reader {
+	return &Reader{R: fwd.NewReaderStatic(source)}
+}
+
 // Reader wraps an io.Reader and provides
 // methods to read MessagePack-encoded values
 // from it. Readers are buffered.
@@ -1372,3 +1377,4 @@ func (m *Reader) ReadIntf() (i interface{}, err error) {
 		return nil, fatal // unreachable
 	}
 }
+
