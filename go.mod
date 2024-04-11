@@ -8,3 +8,5 @@ require (
 )
 
 require golang.org/x/mod v0.18.0 // indirect
+
+replace github.com/philhofer/fwd => github.com/formationgames/fwd v1.2.0-static
