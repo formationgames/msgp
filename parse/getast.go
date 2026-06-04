@@ -45,8 +45,8 @@ type FileSet struct {
 	NoDuplicates    bool                 // Reject duplicate keys for all types
 	NoDupTypes      map[string]struct{}   // Reject duplicate keys for specific types only
 
-	tagName    string // tag to read field names from
-	pointerRcv bool   // generate with pointer receivers.
+	tagNames   []string // tags to read field names from, in priority order
+	pointerRcv bool     // generate with pointer receivers.
 }
 
 // File parses a file at the relative path
@@ -65,6 +65,7 @@ func File(name string, unexported bool, directives []string) (*FileSet, error) {
 		Directives: append([]string{}, directives...),
 		ArrayLimit: math.MaxUint32,
 		MapLimit:   math.MaxUint32,
+		tagNames:   []string{"msg", "msgpack"},
 	}
 
 	fset := token.NewFileSet()
@@ -527,15 +528,12 @@ func (fs *FileSet) getField(f *ast.Field) []gen.StructField {
 	var extension, flatten bool
 	// parse tag; otherwise field name is field tag
 	if f.Tag != nil {
+		st := reflect.StructTag(strings.Trim(f.Tag.Value, "`"))
 		var body string
-		if fs.tagName != "" {
-			body = reflect.StructTag(strings.Trim(f.Tag.Value, "`")).Get(fs.tagName)
-		}
-		if body == "" {
-			body = reflect.StructTag(strings.Trim(f.Tag.Value, "`")).Get("msg")
-		}
-		if body == "" {
-			body = reflect.StructTag(strings.Trim(f.Tag.Value, "`")).Get("msgpack")
+		for _, name := range fs.tagNames {
+			if body = st.Get(name); body != "" {
+				break
+			}
 		}
 		tags := strings.Split(body, ",")
 		if len(tags) >= 2 {
